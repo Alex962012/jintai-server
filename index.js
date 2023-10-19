@@ -1,10 +1,10 @@
 import "dotenv/config";
 import express from "express";
-import bodyParser from "body-parser";
 
+import mongoose from "mongoose";
 import cors from "cors";
 import { productsRoute } from "./routes/productsRoute.js";
-import { sequelize } from "./db.js";
+
 import { typeRoute } from "./routes/typeRoute.js";
 import { userRoute } from "./routes/userRoute.js";
 import fileUpload from "express-fileupload";
@@ -27,12 +27,16 @@ app.use("/product", productsRoute);
 app.use("/type", typeRoute);
 app.use("/user", userRoute);
 
+
+
+
 const start = async () => {
     try {
 
-        await sequelize.authenticate();
-        await sequelize.sync()
-
+        mongoose.connect(
+            "mongodb+srv://alex96201212:nissan12@jintaibd.sirw1ek.mongodb.net/")
+            .then(() => console.log("db ok"))
+            .catch((err) => console.log("db error", err));
         app.listen(port, () => {
             console.log(`Example app listening on port ${port}`);
         });

@@ -1,6 +1,5 @@
-import { Product } from "../models/models.js";
-import { ProductInfo } from "../models/models.js";
-import { Images } from "../models/models.js";
+import Product from "../models/Product.js";
+
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -13,12 +12,11 @@ export const getAll = async (req, res) => {
         const { typeId } = req.query;
         let products;
         if (typeId) {
-            products = await Product.findAll({ where: { typeId } });
+            products = await Product.find({ typeId: typeId });
         }
         if (!typeId) {
-            products = await Product.findAll();
+            products = await Product.find({});
         }
-
         res.json(products);
     } catch (err) {
         console.log(err);
@@ -28,23 +26,33 @@ export const getAll = async (req, res) => {
 export const add = async (req, res) => {
     try {
         let { title, typeId, info } = req.body;
-        let { imageUrl } = req.files;
-        let fileName = uuidv4() + ".jpg";
-        let uploadPath = path.resolve(__dirname, "..", "static", fileName);
-        imageUrl.mv(uploadPath);
-        res.json(imageUrl);
-        const product = await Product.create({ title, typeId, imageUrl: fileName });
+        let imageUrl;
+        let filenames;
+        if (!req.files.imageUrl.length) {
+            imageUrl = req.files.imageUrl;
+            let fileName = uuidv4() + ".jpg";
+            filenames = fileName;
+            let uploadPath = path.resolve(__dirname, "..", "static", fileName);
+            imageUrl.mv(uploadPath);
+        }
+        if (req.files.imageUrl.length > 1) {
+            imageUrl = req.files.imageUrl;
+            filenames = [];
+            for (let i = 0; i < imageUrl.length; i++) {
+                let fileName = uuidv4() + ".jpg";
+                filenames.push(fileName);
+                let uploadPath = path.resolve(__dirname, "..", "static", fileName);
+                imageUrl[i].mv(uploadPath);
+            }
+        }
 
         if (info) {
             info = JSON.parse(info);
-            info.forEach((i) => {
-                ProductInfo.create({
-                    title: i.title,
-                    description: i.description,
-                    productId: product.id,
-                });
-            });
         }
+        const product = new Product({ title, typeId, imageUrl: filenames, info });
+        const result = await product.save();
+
+        res.json(product);
     } catch (err) {
         console.log(err);
         res.status(500).json({ message: "Не удалось создать товар" });
@@ -52,50 +60,54 @@ export const add = async (req, res) => {
 };
 export const update = async (req, res) => {
     try {
-        const { id } = req.params
+        const { id } = req.params;
         let { title, typeId, info } = req.body;
-        let { imageUrl } = req.files;
-        let fileName = uuidv4() + ".jpg";
-        let uploadPath = path.resolve(__dirname, "..", "static", fileName);
-        imageUrl.mv(uploadPath);
-        const newProduct = await Product.update({ title, typeId, imageUrl: fileName }, {
-            where: {
-                id: id
-            },
-        });
+        let imageUrl;
+        let filenames;
+        if (!req.files.imageUrl.length) {
+            imageUrl = req.files.imageUrl;
+            let fileName = uuidv4() + ".jpg";
+            filenames = fileName;
+            let uploadPath = path.resolve(__dirname, "..", "static", fileName);
+            imageUrl.mv(uploadPath);
+        }
+        if (req.files.imageUrl.length > 1) {
+            imageUrl = req.files.imageUrl;
+            filenames = [];
+            for (let i = 0; i < imageUrl.length; i++) {
+                let fileName = uuidv4() + ".jpg";
+                filenames.push(fileName);
+                let uploadPath = path.resolve(__dirname, "..", "static", fileName);
+                imageUrl[i].mv(uploadPath);
+            }
+        }
+
         if (info) {
             info = JSON.parse(info);
-            ProductInfo.destroy(
-                {
-                    where: {
-                        productId: id
-                    }
-                },);
-
-            info.forEach((i) => {
-                ProductInfo.create({
-                    title: i.title,
-                    description: i.description,
-                    productId: id,
-                });
-            });
-
         }
-        res.json(info);
+        const newProduct = await Product.updateOne(
+            { _id: id },
+            {
+                title,
+                typeId,
+                imageUrl: filenames,
+                info: info
+            }
+        );
+
+        res.json(newProduct);
     } catch (e) {
-        console.log(err);
+        console.log(e);
         res.status(500).json({ message: "Не удалось изменить товар" });
     }
 };
 export const remove = async (req, res) => {
     try {
-        const { id } = req.params;
-        const product = await Product.destroy({
-            where: {
-                id,
-            },
+        const postId = req.params.id;
+        await Product.findOneAndDelete({
+            _id: postId,
         });
-        return res.json({ message: `Товар удален ${product}` });
+        return res.json({ message: `Товар удален ${Product}` });
     } catch (e) {
         console.log(err);
         res.status(500).json({ message: "Не удалось удалить товар" });
@@ -106,10 +118,7 @@ export const getOne = async (req, res) => {
     try {
         const { id } = req.params;
         const product = await Product.findOne({
-            where: { id },
-            include: [
-                { model: ProductInfo, as: "info" },
-            ],
+            _id: id,
         });
         return res.json(product);
     } catch (err) {

@@ -1,4 +1,4 @@
-import { User } from "../models/models.js";
+import User from "../models/User.js";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
@@ -16,7 +16,7 @@ export const registration = async (req, res) => {
         if (!email || !password) {
             return res.status(500).json({ message: "Не корректно указан емайл и пароль" });
         }
-        const candidate = await User.findOne({ where: { email } })
+        const candidate = await User.findOne({ email })
         if (candidate) {
             return res.status(500).json({ message: "Пользователь уже существует" });
         }
@@ -32,7 +32,7 @@ export const registration = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body
-        const user = await User.findOne({ where: { email } })
+        const user = await User.findOne({ email })//
         if (!user) {
             return res.status(500).json({ message: "Пользователь не найден" });
         }
@@ -40,7 +40,7 @@ export const login = async (req, res) => {
         if (!comparePassword) {
             return res.status(500).json({ message: "Неверный пароль" });
         }
-        const token = generateJwt(user.id, user.email)
+        const token = generateJwt(user._id, user.email)
         return res.json({ token })
     } catch (e) {
         console.log(err);

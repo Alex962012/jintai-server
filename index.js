@@ -34,7 +34,7 @@ const start = async () => {
     try {
 
         mongoose.connect(
-            "mongodb+srv://alex96201212:nissan12@jintaibd.sirw1ek.mongodb.net/")
+            "mongodb+srv://alex96201212:nissan12@jintaibd.sirw1ek.mongodb.net/test?retryWrites=true&w=majority")
             .then(() => console.log("db ok"))
             .catch((err) => console.log("db error", err));
         app.listen(port, () => {

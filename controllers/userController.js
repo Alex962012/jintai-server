@@ -43,7 +43,7 @@ export const login = async (req, res) => {
         const token = generateJwt(user._id, user.email)
         return res.json({ token })
     } catch (e) {
-        console.log(err);
+        console.log(e);
         res.status(500).json({ message: "Не удалось авторизоваться" });
     }
 };
@@ -53,7 +53,7 @@ export const check = async (req, res) => {
 
         res.json({ message: 'all' });
     } catch (e) {
-        console.log(err);
+        console.log(e);
         res.status(500).json({ message: "Не задан id" });
     }
 };

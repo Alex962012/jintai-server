@@ -32,7 +32,7 @@ export const add = async (req, res) => {
             imageUrl = req.files.imageUrl;
             let fileName = uuidv4() + ".jpg";
             filenames = fileName;
-            let uploadPath = path.resolve(__dirname, "..", "static", fileName);
+            let uploadPath = path.resolve(__dirname, "..", "images", fileName);
             imageUrl.mv(uploadPath);
         }
         if (req.files.imageUrl.length > 1) {

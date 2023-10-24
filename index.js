@@ -33,8 +33,8 @@ const start = async () => {
     try {
         mongoose
             .connect(
-                "mongodb+srv://alex96201212:nissan12@jintaibd.sirw1ek.mongodb.net/test?retryWrites=true&w=majority"
-                // 'mongodb://localhost/test', { useCreateIndex: true, useNewUrlParser: true }
+                // "mongodb+srv://alex96201212:nissan12@jintaibd.sirw1ek.mongodb.net/test?retryWrites=true&w=majority"
+                'mongodb://localhost/test', { useCreateIndex: true, useNewUrlParser: true }
             )
             .then(() => console.log("db ok"))
             .catch((err) => console.log("db error", err));

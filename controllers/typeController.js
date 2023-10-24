@@ -20,11 +20,11 @@ export const add = async (req, res) => {
         const { name } = req.body;
         const { imageUrl } = req.files;
         let fileName = uuidv4() + ".jpg";
-        let uploadPath = path.resolve(__dirname, "..", "static", fileName);
+        let uploadPath = path.resolve(__dirname, "..", "images", fileName);
         imageUrl.mv(uploadPath);
         const type = new Type({ name, imageUrl: fileName });
         const result = await type.save();
-        return res.json(result);
+        return res.json(uploadPath);
     } catch (e) {
         console.log(e);
         res.status(500).json({ message: "Не удалось создать тип товара" });

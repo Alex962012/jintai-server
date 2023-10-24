@@ -41,7 +41,7 @@ export const add = async (req, res) => {
             for (let i = 0; i < imageUrl.length; i++) {
                 let fileName = uuidv4() + ".jpg";
                 filenames.push(fileName);
-                let uploadPath = path.resolve(__dirname, "..", "static", fileName);
+                let uploadPath = path.resolve(__dirname, "..", "images", fileName);
                 imageUrl[i].mv(uploadPath);
             }
         }
@@ -68,7 +68,7 @@ export const update = async (req, res) => {
             imageUrl = req.files.imageUrl;
             let fileName = uuidv4() + ".jpg";
             filenames = fileName;
-            let uploadPath = path.resolve(__dirname, "..", "static", fileName);
+            let uploadPath = path.resolve(__dirname, "..", "images", fileName);
             imageUrl.mv(uploadPath);
         }
         if (req.files.imageUrl.length > 1) {
@@ -77,7 +77,7 @@ export const update = async (req, res) => {
             for (let i = 0; i < imageUrl.length; i++) {
                 let fileName = uuidv4() + ".jpg";
                 filenames.push(fileName);
-                let uploadPath = path.resolve(__dirname, "..", "static", fileName);
+                let uploadPath = path.resolve(__dirname, "..", "images", fileName);
                 imageUrl[i].mv(uploadPath);
             }
         }
